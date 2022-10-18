@@ -1,20 +1,27 @@
 import matplotlib.pyplot as plt
 import numpy as np
+from geopy.geocoders import Nominatim
 
 from pykrige.uk import UniversalKriging
 
-data = np.array(
-    [
-        [0.3, 1.2, 0.47],
-        [1.9, 0.6, 0.56],
-        [1.1, 3.2, 0.74],
-        [3.3, 4.4, 1.47],
-        [4.7, 3.8, 1.74],
-    ]
-)
+geolocator = Nominatim(user_agent="vogu_basyan_kriging")
 
-gridx = np.arange(0.0, 5.5, 0.5)
-gridy = np.arange(0.0, 5.5, 0.5)
+data = np.empty((0, 3))
+
+address = ''
+while address != '.':
+    address = input()
+    addressGeoCode = geolocator.geocode(address)
+    if addressGeoCode:
+        # получение широны и долготы точки
+        newDataElement = np.array([addressGeoCode.latitude, addressGeoCode.longitude, np.random.uniform(low=0.0, high=0.1)])
+        data = np.vstack([data, newDataElement])
+
+
+# шиорта - координата x, максимум 90
+gridx = np.arange(0.0, 90.0, 1.5)
+# долгота - координата y, максимум 189
+gridy = np.arange(0.0, 180.0, 1.5)
 
 UK = UniversalKriging(
     data[:, 0],
