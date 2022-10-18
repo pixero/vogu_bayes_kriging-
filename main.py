@@ -19,9 +19,9 @@ while address != '.':
 
 
 # шиорта - координата x, максимум 90
-gridx = np.arange(0.0, 90.0, 1.5)
+gridx = np.arange(0.0, 90.0, 1.0)
 # долгота - координата y, максимум 189
-gridy = np.arange(0.0, 180.0, 1.5)
+gridy = np.arange(0.0, 180.0, 1.0)
 
 UK = UniversalKriging(
     data[:, 0],
