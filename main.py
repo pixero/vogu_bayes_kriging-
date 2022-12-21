@@ -1,35 +1,39 @@
-import matplotlib.pyplot as plt
-import numpy as np
-from geopy.geocoders import Nominatim
+# Name: EmpiricalBayesianKriging_Example_02.py
+# Description: Bayesian kriging approach whereby many models created around the
+#   semivariogram model estimated by the restricted maximum likelihood algorithm is used.
+# Requirements: Geostatistical Analyst Extension
+# Author: Esri
 
-from pykrige.uk import UniversalKriging
+# Import system modules
+import arcpy
+from arcpy import env
 
-geolocator = Nominatim(user_agent="vogu_basyan_kriging")
+# Set environment settings
+arcpy.env.workspace = "D:/ArcGisProj/Vogu"
 
-data = np.empty((0, 3))
+# Set local variables
+in_features = "voduData.shp"
+z_field = "CND"
+out_ga_layer = "outEBKVoguPython"
+out_raster = None
+cell_size = 3
+transformation_type = "NONE"
+max_local_points = 100
+overlap_factor = 1
+number_semivariograms = 100
+# Set variables for search neighborhood
+radius = 5.230788
+search_neighborhood = arcpy.SearchNeighborhoodStandardCircular(radius)
+outputType = "PREDICTION"
+quantile_value = ""
+threshold_type = ""
+probability_threshold = ""
+semivariogram_model_type = "POWER"
+# Check out the ArcGIS Geostatistical Analyst extension license
+arcpy.CheckOutExtension("GeoStats")
 
-address = ''
-while address != '.':
-    address = input()
-    addressGeoCode = geolocator.geocode(address)
-    if addressGeoCode:
-        # получение широны и долготы точки
-        newDataElement = np.array([addressGeoCode.latitude, addressGeoCode.longitude, np.random.uniform(low=0.0, high=0.1)])
-        data = np.vstack([data, newDataElement])
-
-
-# шиорта - координата x, максимум 90
-gridx = np.arange(0.0, 90.0, 1.0)
-# долгота - координата y, максимум 189
-gridy = np.arange(0.0, 180.0, 1.0)
-
-UK = UniversalKriging(
-    data[:, 0],
-    data[:, 1],
-    data[:, 2],
-    variogram_model="linear",
-    drift_terms=["regional_linear"],
-)
-z, ss = UK.execute("grid", gridx, gridy)
-plt.imshow(z)
-plt.show()
+# Execute EmpiricalBayesianKriging
+res = arcpy.EmpiricalBayesianKriging_ga(in_features, z_field, out_ga_layer, out_raster,
+                                        cell_size, transformation_type, max_local_points, overlap_factor, number_semivariograms,
+                                        search_neighborhood, outputType, quantile_value, threshold_type, probability_threshold,
+                                        semivariogram_model_type)
